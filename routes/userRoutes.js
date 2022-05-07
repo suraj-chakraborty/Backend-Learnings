@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const User = require("../modals/userModals");
+const { protect } = require("../middleware/authMiddleware");
 
 router.post(
   "/",
@@ -66,8 +67,10 @@ router.post(
 
 router.get(
   "/me",
+  protect,
   asyncHandler(async (req, res) => {
-    res.status(200).json({ message: "get me" });
+    const { _id, name, email } = await User.findById(req.user.id);
+    res.status(200).json({ id: _id, name, email });
   })
 );
 

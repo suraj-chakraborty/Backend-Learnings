@@ -1,15 +1,17 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 const router = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 
 const Goal = require("../modals/goalModal");
 
 // routes
 router.get(
   "/",
+  protect,
   asyncHandler(async (req, res) => {
     // res.status(200).json({ message: "get goals" });
-    const goals = await Goal.find();
+    const goals = await Goal.find({ user: req.user.id });
 
     res.status(200).json(goals);
   })
@@ -17,6 +19,7 @@ router.get(
 
 router.post(
   "/",
+  protect,
   asyncHandler(async (req, res) => {
     if (!req.body.text) {
       res.status(400).json({ message: "text field is empty" });
@@ -24,6 +27,7 @@ router.post(
 
     const goals = await Goal.create({
       text: req.body.text,
+      user: req.user.id,
     });
     res.status(200).json(goals);
   })
@@ -31,6 +35,7 @@ router.post(
 
 router.put(
   "/:id",
+  protect,
   asyncHandler(async (req, res) => {
     const goals = await Goal.findById(req.params.id);
 
@@ -48,6 +53,7 @@ router.put(
 
 router.delete(
   "/:id",
+  protect,
   asyncHandler(async (req, res) => {
     const goals = await Goal.findById(req.params.id);
 
