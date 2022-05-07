@@ -35,6 +35,7 @@ router.post(
         _id: user.id,
         name: user.name,
         email: user.email,
+        Token: generateToken(user._id),
       });
     } else {
       res.status(400).json({ message: "Invalid User" });
@@ -45,7 +46,21 @@ router.post(
 router.post(
   "/login",
   asyncHandler(async (req, res) => {
-    res.status(200).json({ message: "login user" });
+    const { email, password } = req.body;
+
+    // check for user email
+    const user = await User.findOne({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        message_id: user.id,
+        name: user.name,
+        email: user.email,
+        Token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: "Invalid username or password" });
+    }
   })
 );
 
@@ -55,5 +70,12 @@ router.get(
     res.status(200).json({ message: "get me" });
   })
 );
+
+// generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 
 module.exports = router;
