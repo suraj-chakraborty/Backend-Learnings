@@ -2,6 +2,7 @@ const express = require("express");
 const asyncHandler = require("express-async-handler");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
+const User = require("../modals/userModals");
 
 const Goal = require("../modals/goalModal");
 
@@ -44,6 +45,18 @@ router.put(
       throw new error("goal not found");
     }
 
+    const user = await User.findById(req.user.id);
+    // check for user
+    if (!user) {
+      res.status(401);
+      throw new Error("User not found");
+    }
+
+    if (goals.user.toString() !== user.id) {
+      res.status(401);
+      throw new Error("User not authorized");
+    }
+
     const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
@@ -62,6 +75,17 @@ router.delete(
       throw new error("goal deleted");
     }
 
+    // check for user
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      res.status(401);
+      throw new Error("User not found");
+    }
+
+    if (goals.user.toString() !== user.id) {
+      res.status(401);
+      throw new Error("User not authorized");
+    }
     const deleted = await Goal.findByIdAndDelete(req.params.id, req.body);
     res.status(200).json(deleted);
 
