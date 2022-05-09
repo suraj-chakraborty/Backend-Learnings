@@ -6,6 +6,7 @@
   "scripts": {
     "test": "nodemon server.js",
     "start": "node server.js"
+    
   },
   "author": "suraj chakraborty",
   "license": "MIT",
