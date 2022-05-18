@@ -45,14 +45,14 @@ router.put(
       throw new error("goal not found");
     }
 
-    const user = await User.findById(req.user.id);
+    // const user = await User.findById(req.user.id);
     // check for user
-    if (!user) {
+    if (!req.user) {
       res.status(401);
       throw new Error("User not found");
     }
 
-    if (goals.user.toString() !== user.id) {
+    if (goals.user.toString() !== req.user.id) {
       res.status(401);
       throw new Error("User not authorized");
     }
@@ -76,13 +76,13 @@ router.delete(
     }
 
     // check for user
-    const user = await User.findById(req.user.id);
-    if (!user) {
+    // const user = await User.findById(req.user.id);
+    if (!req.user) {
       res.status(401);
       throw new Error("User not found");
     }
 
-    if (goals.user.toString() !== user.id) {
+    if (goals.user.toString() !== req.user.id) {
       res.status(401);
       throw new Error("User not authorized");
     }
